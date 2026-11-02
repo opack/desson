@@ -45,6 +45,7 @@ textarea:focus-visible,button:focus-visible,input:focus-visible{outline:2px soli
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
 .ctl{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
 .btn{font:600 14px var(--body);background:var(--ink);color:var(--panel);border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
 .dl{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
 a.btn{text-decoration:none;display:inline-block}
@@ -120,7 +121,7 @@ a.btn{text-decoration:none;display:inline-block}
     <div class="out" id="out"></div>
     <div id="guesswrap" class="guess" hidden>
       <p class="hint-game">Tape un caractère sous chaque symbole : le curseur avance tout seul.</p>
-      <div class="bar"><button type="button" class="btn" id="check">Vérifier</button><button type="button" class="btn ghost" id="clear">Effacer</button><span id="score" class="score" aria-live="polite"></span></div>
+      <div class="bar"><button type="button" class="btn" id="check">Vérifier</button><button type="button" class="btn ghost" id="clear">Effacer</button><label class="ctl" for="live"><input type="checkbox" id="live"> Vérifier pendant la saisie</label><span id="score" class="score" aria-live="polite"></span></div>
     </div>
   </section>
 
@@ -326,27 +327,30 @@ function soundOf(v){const n=normalize(v);if(/^[0-9]$/.test(n))return '#'+n;retur
 function clearMarks(){out.querySelectorAll('.gcell.ok,.gcell.ko,.gcell.miss').forEach(c=>c.classList.remove('ok','ko','miss'));$('score').textContent=''}
 out.addEventListener('input',e=>{
   const el=e.target;if(!el.classList||!el.classList.contains('gin'))return;
-  clearMarks();
   let v=normalize(el.value);
-  if(v.endsWith('^')){el.value='^';return}           /* touche morte : on attend la lettre */
-  v=[...v].pop()||'';el.value=v;
+  if(v.endsWith('^')){el.value='^';clearMarks();return}           /* touche morte : on attend la lettre */
+  v=[...v].pop()||'';el.value=v;afterEdit();
   if(v){const all=gins(),k=all.indexOf(el);if(all[k+1])all[k+1].focus()}
 });
 out.addEventListener('keydown',e=>{
   const el=e.target;if(!el.classList||!el.classList.contains('gin'))return;
   const all=gins(),k=all.indexOf(el);
-  if(e.key==='Backspace'&&!el.value&&k>0){e.preventDefault();all[k-1].value='';all[k-1].focus();clearMarks()}
+  if(e.key==='Backspace'&&!el.value&&k>0){e.preventDefault();all[k-1].value='';all[k-1].focus();afterEdit()}
   else if(e.key==='ArrowLeft'&&k>0){e.preventDefault();all[k-1].focus()}
   else if((e.key==='ArrowRight'||e.key==='Enter')&&all[k+1]){e.preventDefault();all[k+1].focus()}
 });
 out.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('gin'))e.target.select()});
-$('check').onclick=()=>{
+function check(live){
   const all=gins();let good=0,miss=0;clearMarks();
   all.forEach(el=>{const st=!el.value?'miss':soundOf(el.value)===el.dataset.x?'ok':'ko';if(st==='ok')good++;if(st==='miss')miss++;el.parentElement.classList.add(st)});
   const bad=all.length-good-miss;
   $('score').textContent=good===all.length?'Bravo, tout est juste !':`${good} juste${good>1?'s':''}`+(bad?`, ${bad} faux`:'')+(miss?`, ${miss} manquant${miss>1?'s':''}`:'')+` sur ${all.length}`;
-};
-$('clear').onclick=()=>{gins().forEach(el=>el.value='');clearMarks();const f=gins()[0];if(f)f.focus()};
+}
+const LIVE=()=>$('live').checked;
+function afterEdit(){if(LIVE())check(true);else clearMarks()}
+$('check').onclick=()=>check(false);
+$('live').addEventListener('change',()=>{$('check').disabled=LIVE();afterEdit()});
+$('clear').onclick=()=>{gins().forEach(el=>el.value='');afterEdit();const f=gins()[0];if(f)f.focus()};
 
 /* ---- Clé ---- */
 $('showkey').onclick=function(){const sec=$('keysec');const open=sec.hidden;sec.hidden=!open;this.setAttribute('aria-expanded',String(open));this.textContent=open?'Masquer la clé':'Afficher la clé';if(open)sec.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})};
