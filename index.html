@@ -104,7 +104,8 @@ a.btn{text-decoration:none;display:inline-block}
   <section class="panel" aria-labelledby="in-l">
     <label class="t" id="in-l" for="src">Ton message</label>
     <div id="srcwrap"><textarea id="src" spellcheck="false">salu ! tu viî jûé o park a 15 êr ?
-ĉokola û gato ?</textarea></div>
+ĉokola û gato ?
+lè-z-âfâ é î-n-om vô vû-z-édé</textarea></div>
     <p class="hidden-note" id="hidnote" hidden>Message caché : à toi de le déchiffrer !</p>
     <div class="bar">
       <label class="ctl" for="size">Taille <input type="range" id="size" min="22" max="64" value="38"></label>
@@ -133,6 +134,8 @@ a.btn{text-decoration:none;display:inline-block}
     <div class="key" id="kc"></div>
     <p class="sub">Chiffres (barre du soroban, point au-dessus = +5)</p>
     <div class="key" id="kd"></div>
+    <p class="sub">Liaison (facultative) : le son de liaison entre deux tirets, collé aux deux mots</p>
+    <div class="key" id="kl"></div>
   </section>
 </div>
 
@@ -212,6 +215,7 @@ function tokenize(s){
       const ch=chars[i];
       if(/\s/.test(ch)){push();continue}
       if(/[0-9]/.test(ch)){let run=ch;while(i+1<chars.length&&/[0-9]/.test(chars[i+1]))run+=chars[++i];cur.push({t:'n',v:run});continue}
+      if(ch==='-'&&cur.length&&CMAP[chars[i+1]]&&chars[i+2]==='-'&&chars[i+3]&&!/\s/.test(chars[i+3])){cur.push({t:'l',v:CMAP[chars[i+1]]});i+=2;continue} /* liaison : mot-z-mot */
       if(CMAP[ch]){cur.push({t:'s',v:CMAP[ch]});continue}
       if(ch==='h')continue;
       cur.push({t:'p',v:ch});
@@ -225,7 +229,13 @@ const GAP=6,LH=50,PW=16;let SPACE=25;
 const BB={};
 function measure(){const ns='http://www.w3.org/2000/svg';const sv=document.createElementNS(ns,'svg');sv.setAttribute('width','0');sv.setAttribute('height','0');sv.style.position='absolute';sv.style.visibility='hidden';document.body.appendChild(sv);
   for(const k in D){sv.innerHTML=`<g>${D[k]('#000')}</g>`;const b=sv.firstChild.getBBox();BB[k]=[b.x-1.1,b.width+2.2]}sv.remove();}
-function tokW(t){return t.t==='s'?BB[t.v][1]+GAP:t.t==='n'?digits(t.v,'#000')[1]+GAP:PW}
+const LK=0.45;                                 /* taille du son de liaison */
+function liaisonW(v){return Math.max(SPACE*1.6,BB[v][1]*LK+20)}
+function liaison(v,w,c){ /* liaison : trait droit à mi-hauteur, le son en petit au-dessus */
+  const [bx,bw]=BB[v],gw=bw*LK;
+  return `<line x1="${(w*0.12).toFixed(1)}" y1="25" x2="${(w*0.88).toFixed(1)}" y2="25" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>`+
+         `<g transform="translate(${((w-gw)/2-bx*LK).toFixed(1)},4) scale(${LK})">${D[v](c)}</g>`}
+function tokW(t){return t.t==='s'?BB[t.v][1]+GAP:t.t==='n'?digits(t.v,'#000')[1]+GAP:t.t==='l'?liaisonW(t.v)+GAP:PW}
 function layout(lines,set,colors,maxW){
   let y=0,maxX=0,body='';
   lines.forEach(words=>{
@@ -236,6 +246,7 @@ function layout(lines,set,colors,maxW){
       if(x>0&&x+ww>maxW){x=0;y+=LH}
       w.forEach(t=>{
         if(t.t==='s'){const c=colors&&VOW.has(t.v)?colors.vowel:colors?colors.ink:inkOnly;body+=`<g transform="translate(${x-BB[t.v][0]},${y+5})">${set[t.v](c)}</g>`;x+=BB[t.v][1]+GAP}
+        else if(t.t==='l'){const c=colors&&VOW.has(t.v)?colors.vowel:colors?colors.ink:inkOnly;const w=liaisonW(t.v);body+=`<g transform="translate(${x},${y})">${liaison(t.v,w,c)}</g>`;x+=w+GAP}
         else if(t.t==='n'){const[o,w2]=digits(t.v,colors?colors.digit:inkOnly);body+=`<g transform="translate(${x},${y+5})">${o}</g>`;x+=w2+GAP}
         else{body+=`<text x="${x+PW/2}" y="${y+36}" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="26" fill="${colors?colors.ink:inkOnly}">${t.v.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</text>`;x+=PW}
       });
@@ -316,6 +327,7 @@ function renderGame(){
   const cell=(svgBody,w,expect)=>{const k=i++;return `<div class="gcell" data-i="${k}"><svg width="${(w*s).toFixed(1)}" height="${(40*s).toFixed(1)}" viewBox="0 0 ${w} 40" aria-hidden="true">${svgBody}</svg><input class="gin" data-i="${k}" data-x="${expect}" maxlength="3" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Symbole ${k+1}" value="${(prev[k]||'').replace(/"/g,'&quot;')}"></div>`};
   const html=lines.map(words=>`<div class="gline" style="column-gap:${(SPACE+GAP)*s}px">`+words.map(w=>`<div class="gword" style="gap:${GAP*s}px">`+w.map(t=>{
     if(t.t==='s'){const c=colors&&VOW.has(t.v)?'var(--vowel)':'var(--ink)';const[bx,bw]=BB[t.v];return cell(`<g transform="translate(${-bx},0)">${D[t.v](c)}</g>`,bw,t.v)}
+    if(t.t==='l'){const c=colors&&VOW.has(t.v)?'var(--vowel)':'var(--ink)';const w=liaisonW(t.v);return cell(liaison(t.v,w,c),w,t.v)}
     if(t.t==='n'){const c=colors?'var(--digit)':'var(--ink)';const dw=Math.max(DIGIT_W,34/s);return `<div class="gword">`+[...t.v].map(d=>cell(`<line x1="0" y1="16" x2="${dw}" y2="16" ${st(c)} stroke-linecap="butt"/><g transform="translate(${(dw-DIGIT_W)/2},0)">${DG[+d](c)}</g>`,dw,'#'+d)).join('')+`</div>`}
     const pv=t.v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
     return `<div class="gcell p"><span style="height:${(40*s).toFixed(1)}px">${pv}</span><input class="gin gin-ro" value="${pv}" readonly tabindex="-1" aria-hidden="true"></div>`;
@@ -365,6 +377,7 @@ $('kd').innerHTML=[0,1,2,3,4,5,6,7,8,9].map(n=>{const[o,w]=digits(String(n),'var
 measure();
 try{const s=localStorage.getItem('code-src');if(s)src.value=s}catch(e){}
 SPACE=+sp.value/20;spv.textContent=sp.value+(sp.value==='500'?' (police)':'');
+$('kl').innerHTML=[['z','vû-z-édé','vous aidez'],['n','î-n-om','un homme'],['t','grâ-t-om','grand homme']].map(([v,k,fr])=>{const w=liaisonW(v);return `<div class="k"><span class="g"><svg width="${w*34/40}" height="34" viewBox="0 5 ${w} 40" aria-hidden="true">${liaison(v,w,'var(--ink)')}</svg></span><span class="s"><kbd>${k}</kbd></span><span class="w">${fr}</span></div>`}).join('');
 render();
 })();
 </script>

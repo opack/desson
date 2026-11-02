@@ -23,6 +23,8 @@ EXAMPLES = [  # (français, saisie Desson)
     ('viens', 'viî'), ('yeux', 'yê'), ('travail', 'travay'),
     ('Salut ! Tu viens jouer au parc à 15 heures ?', 'salu ! tu viî jûé o park a 15 êr ?'),
 ]
+LIAISONS = [('les enfants', 'lè-z-âfâ'), ('un homme', 'î-n-om'), ('vous aidez', 'vû-z-édé'),
+            ('Les enfants et un grand homme vont vous aider.', 'lè-z-âfâ é î grâ-t-om vô vû-z-édé.')]
 NUMBERS = ['15', '2026', '407']
 
 
@@ -47,9 +49,14 @@ def html(font_url):
     cons = ''.join(card(s) for s in desson.CONSONANTS)
     vows = ''.join(card(s) for s in desson.VOWELS)
     digs = ''.join(digit_card(n) for n in range(10))
-    ex = ''.join(f'<div class="ex"><span>{fr}</span><span class="ds">{ds}</span><code>{ds}</code></div>'
-                 for fr, ds in EXAMPLES)
-    nums = ''.join(f'<div class="ex"><span>{n}</span><span class="ds num">{n}</span></div>' for n in NUMBERS)
+    row = lambda fr, ds: f'<div class="ex"><span>{fr}</span><span class="ds">{ds}</span><code>{ds}</code></div>'
+    words = [e for e in EXAMPLES if len(e[0]) < 30]
+    ex = (f'<div class="cols">{"".join(row(*e) for e in words)}</div>'
+          + ''.join(row(*e) for e in EXAMPLES if e not in words))
+    lw = [e for e in LIAISONS if len(e[0]) < 30]
+    lias = (f'<div class="cols">{"".join(row(*e) for e in lw)}</div>'
+            + ''.join(row(*e) for e in LIAISONS if e not in lw))
+    nums = '<div class="cols">' + ''.join(f'<div class="ex"><span>{n}</span><span class="ds num">{n}</span></div>' for n in NUMBERS) + '</div>'
     return f'''<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><style>
 @font-face{{font-family:Desson;src:url("{font_url}")}}
 @page{{size:A4;margin:13mm}}
@@ -68,6 +75,7 @@ h2{{font-size:15px;margin:14px 0 6px}} p,li{{line-height:1.45;color:#444}}
 .ex span:first-child{{min-width:120px;max-width:200px;color:#555;font-size:12px}}
 .ds{{font-family:Desson;font-size:30px;color:{INK}}} .num{{color:{DIGIT}}}
 .ex code{{font-size:11px;color:#999}}
+.cols{{display:grid;grid-template-columns:1fr 1fr;column-gap:24px}} .cols .ex span:first-child{{min-width:80px}}
 </style></head><body>
 <h1>Desson</h1><p class="sub">Des sons dessinés : un dessin par son.</p>
 <p>On écrit les <b>sons</b>, pas les lettres. Chaque son a son dessin : un objet dont le nom commence par ce son
@@ -83,6 +91,11 @@ Pour 5 à 9, on ajoute <b>la perle du haut</b> (un point au-dessus de la barre, 
 <div class="pb"></div><h2>Exemples</h2>
 <p>On écrit ce qu'on entend : les lettres muettes disparaissent, « oi » s'écrit « ou » + « a », « un » s'écrit comme « in », et on met « i » ou « y » selon ce qu'on entend (viens, yeux).</p>
 {ex}{nums}
+<h2>Les liaisons (facultatives)</h2>
+<p>Quand on veut noter une liaison, on écrit son son entre deux tirets, collé aux deux mots : <code>vû-z-édé</code>.
+Elle se dessine par <b>un trait à mi-hauteur</b> à la place de l'espace, avec le son de liaison <b>en petit au-dessus</b>.
+On peut aussi s'en passer : <code>vû édé</code> se lit très bien.</p>
+{lias}
 </body></html>'''
 
 

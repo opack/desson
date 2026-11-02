@@ -30,6 +30,7 @@ DIGIT_ADV = desson.DIGIT_W * SCALE
 PUNCT_FONT = os.path.join(HERE, 'fonts', 'DejaVuSans-ExtraLight.ttf')  # ponctuation (licence libre)
 PUNCT = "!?.,;:'’\"“”«»()[]-–—…/%+=*&@#_¡¿°"
 NO_SPACE_BEFORE = '!?:;»'
+LIAISON_SCALE = 0.45  # taille du son de liaison, dessiné au-dessus du trait
 
 GLYPH_NAMES = {'é': 'eacute', 'è': 'egrave', 'in': 'in_'}
 
@@ -99,6 +100,21 @@ def build(out, version):
         adv[gname(s)] = round(xmax - xmin + 2 * SIDE_BEARING)
         order.append(gname(s))
 
+    # liaisons (« mot-z-mot ») : trait droit à mi-hauteur, le son en petit au-dessus
+    k = LIAISON_SCALE
+    for s in desson.CONSONANTS + desson.VOWELS:
+        full = outline(desson.GLYPHS[s]('#000'), 0)
+        xmin, _, xmax, _ = full.bounds
+        gw = (xmax - xmin) * k
+        w = max(1.6 * SPACE, gw + 20 * SCALE)
+        small = pathops.Path()
+        full.draw(TransformPen(small.getPen(), (k, 0, 0, k, (w - gw) / 2 - xmin * k, TOP * (1 - k) + SCALE)))
+        x1, x2 = w * 0.12 / SCALE, w * 0.88 / SCALE
+        line = outline(f'<line x1="{x1}" y1="20" x2="{x2}" y2="20" fill="none" stroke-width="1.8"/>', 0)
+        g = 'l_' + gname(s)[2:]
+        glyphs[g], adv[g] = ttglyph(pathops.op(line, small, pathops.PathOp.UNION)), round(w)
+        order.append(g)
+
     # chiffres : largeur fixe, barre sur toute la largeur pour former une barre continue
     for n in range(10):
         body = desson.digit_bar(0, desson.DIGIT_W, '#000') + desson.digit(n, '#000')
@@ -157,9 +173,17 @@ def build(out, version):
 
     # pas d'espace visible devant ! ? : ; » ni après «
     before = ' '.join(punct[ord(c)] for c in NO_SPACE_BEFORE if ord(c) in punct)
+    hy = punct[ord('-')]
+    ligs = '\n'.join(f'  sub {hy} {cmap[ord(c)]} {hy} by l_{cmap[ord(c)][2:]};'
+                     for c in sorted({c for ch in desson.KEYMAP for c in (ch, ch.upper()) if len(c) == 1}))
     addOpenTypeFeaturesFromString(fb.font, f"""
 languagesystem DFLT dflt; languagesystem latn dflt;
+lookup liaison {{
+{ligs}
+}} liaison;
+feature liga {{ lookup liaison; }} liga;
 feature calt {{
+  lookup liaison;
   sub space' [{before}] by zerospace;
   sub {punct[ord('«')]} space' by zerospace;
 }} calt;""")

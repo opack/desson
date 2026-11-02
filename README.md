@@ -18,6 +18,9 @@ On écrit ce qu'on entend, sans les lettres muettes.
 - On écrit ce qu'on entend : `i` dans `viî` (viens) ou `pié` (pied), `y` dans `yê` (yeux), `yaûrt` (yaourt) ou `travay` (travail).
 - **Chiffres façon soroban** : chaque chiffre est posé sous une barre (petit rond = 0, point = 1, trait = 2,
   V = 3, + = 4) ; pour 5 à 9, un point au-dessus de la barre ajoute 5. Les chiffres d'un nombre partagent la même barre.
+- **Liaisons (facultatives)** : on écrit le son de liaison entre deux tirets, collé aux deux mots
+  (`lè-z-âfâ`, `î-n-om`, `vû-z-édé`). Il se dessine par un trait à mi-hauteur à la place de l'espace, avec le son en petit au-dessus.
+  Sans liaison, on écrit simplement les deux mots : `vû édé`.
 
 ## Saisie au clavier
 
@@ -49,6 +52,8 @@ précédente, la désinstaller d'abord, puis redémarrer Word (ou le PC) pour vi
 - Pas d'espace visible devant `! ? : ; »` ni après `«` : les espaces insécables ont une largeur nulle, et une règle
   contextuelle masque les espaces normales. Dans Word, cette règle demande de cocher
   *Police > Paramètres avancés > Utiliser des alternatives contextuelles*.
+- Liaisons : `-z-` (ou tout autre son entre deux tirets) se transforme en trait de liaison avec le son en petit au-dessus.
+  Même réglage Word que ci-dessus (alternatives contextuelles) ; les applications qui activent les ligatures standard l'affichent aussi.
 
 ## Régénérer la police, la page et le guide
 
@@ -56,7 +61,7 @@ précédente, la désinstaller d'abord, puis redémarrer Word (ou le PC) pour vi
 cd src
 pip install -r requirements.txt
 playwright install chromium        # une seule fois, pour le guide PDF
-python make.py --version 1.300     # augmenter la version de la police à chaque changement
+python make.py --version 1.500     # augmenter la version de la police à chaque changement
 ```
 
 - `src/desson.py` : les dessins (SVG dans une case de 40 × 40), les objets-repères, la saisie clavier et les chiffres.
