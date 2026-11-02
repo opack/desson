@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Desson</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Outil : saisie en haut, rendu au centre, clé du clavier en bas. Papier froid, encre bleu-nuit. */
+  --bg:#F2F4F7; --panel:#FFFFFF; --ink:#1B2230; --muted:#5D6675; --line:#DCE1E8;
+  --vowel:#D2552B; --digit:#1F64AD; --focus:#1F64AD;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11151C; --panel:#1A2029; --ink:#E7EBF1; --muted:#9AA4B3; --line:#2C3441;
+    --vowel:#F08A62; --digit:#76AEEA; --focus:#76AEEA; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11151C; --panel:#1A2029; --ink:#E7EBF1; --muted:#9AA4B3; --line:#2C3441;
+  --vowel:#F08A62; --digit:#76AEEA; --focus:#76AEEA; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 48px;display:flex;flex-direction:column;gap:22px}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:500;font-size:19px;margin:0}
+.lead{color:var(--muted);margin:6px 0 0;max-width:65ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
+label.t{font-weight:700;font-size:14px}
+textarea{width:100%;min-height:96px;resize:vertical;font:18px/1.5 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+textarea:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted)}
+.hint code{font-family:ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--ink)}
+.bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:600 14px var(--body);background:transparent;color:var(--ink);border:0;padding:7px 14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.ctl{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.btn{font:600 14px var(--body);background:var(--ink);color:var(--panel);border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+[hidden]{display:none!important}
+.msg{font-size:13px;color:var(--muted);margin:0}
+.msg:empty{display:none}
+.out{display:flex;flex-direction:column;gap:18px}
+.out .block{display:flex;flex-direction:column;gap:6px}
+.out .name{font-size:13px;font-weight:700;color:var(--muted);text-transform:none}
+.out svg{display:block;max-width:100%;height:auto}
+.key{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.k{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.k .g{grid-row:1 / span 2;display:flex;gap:2px}
+.k .s{font-weight:700;font-size:15px;display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px}
+.k .s kbd{font:600 13px ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--ink)}
+.k .w{font-size:12px;color:var(--muted)}
+.sub{font-size:14px;font-weight:700;color:var(--muted);margin:4px 0 0}
+@media (max-width:420px){h1{font-size:25px}.wrap{padding:20px 16px 40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Desson</h1>
+    <p class="lead">Tape ton message comme il se prononce, un caractère par son : il s'affiche aussitôt en desson.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="in-l">
+    <label class="t" id="in-l" for="src">Ton message</label>
+    <textarea id="src" spellcheck="false">salu ! tu vyî jûé o park a 15 êr ?
+ĉokola û gato ?</textarea>
+    <div class="bar">
+      <label class="ctl" for="size">Taille <input type="range" id="size" min="22" max="64" value="38"></label>
+      <label class="ctl" for="sp">Espace entre les mots <input type="range" id="sp" min="200" max="1000" step="20" value="500"> <output id="spv" for="sp" style="font-variant-numeric:tabular-nums;color:var(--ink);font-weight:700;min-width:7ch">500</output></label>
+      <label class="ctl" for="col"><input type="checkbox" id="col" checked> Couleurs</label>
+      <button type="button" class="btn" id="copy">Copier en image</button>
+      <button type="button" class="btn ghost" id="showkey" aria-expanded="false" aria-controls="keysec">Afficher la clé</button>
+    </div>
+    <p class="msg" id="msg" role="status"></p>
+  </section>
+
+  <section class="panel" aria-label="Message codé">
+    <div class="out" id="out"></div>
+  </section>
+
+  <section class="panel" id="keysec" aria-labelledby="key-h" hidden>
+    <h2 id="key-h">La clé : quelle touche pour quel son</h2>
+    <p class="sub">Voyelles</p>
+    <div class="key" id="kv"></div>
+    <p class="sub">Consonnes</p>
+    <div class="key" id="kc"></div>
+    <p class="sub">Chiffres (barre du soroban, point au-dessus = +5)</p>
+    <div class="key" id="kd"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+const VOW=new Set(['a','i','é','è','o','ou','u','eu','an','in','on']);
+const st=(c,w)=>`fill="none" stroke="${c}" stroke-width="${w||2.2}" stroke-linecap="round" stroke-linejoin="round"`;
+const L=(a,b,c,d,col,w)=>`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" ${st(col,w)}/>`;
+const dot=(x,y,c,r)=>`<circle cx="${x}" cy="${y}" r="${r||2}" fill="${c}"/>`;
+const spiral=(()=>{let p=[];for(let i=0;i<=60;i++){const a=i/60*Math.PI*5,r=1.5+i/60*11;p.push((20+r*Math.cos(a)).toFixed(1)+','+(20+r*Math.sin(a)).toFixed(1))}return p.join(' ')})();
+
+/* ---- Dessins-repères ---- */
+const D={
+p:c=>`<path d="M30 20 Q20 8 9 20 Q20 32 30 20 L36 13 M30 20 L36 27" ${st(c)}/>`,
+b:c=>`<path d="M4 22 L36 22 Q20 42 4 22 Z" ${st(c)}/>`+L(20,22,20,4,c),
+t:c=>`<polyline points="7,29 20,10 33,29" ${st(c)}/>`,
+d:c=>`<rect x="9" y="9" width="22" height="22" rx="3" ${st(c)}/>`+dot(20,20,c),
+k:c=>`<path d="M25 34 L25 14 Q25 7 18.5 7 Q12 7 12 14" ${st(c)}/>`,
+g:c=>`<path d="M20 5 Q31 20 27 28 Q20 36 13 28 Q9 20 20 5 Z" ${st(c)}/>`,
+f:c=>`<rect x="3" y="15" width="34" height="10" rx="5" ${st(c)}/>`+dot(13,20,c)+dot(20,20,c)+dot(27,20,c),
+v:c=>`<path d="M5 22 C12 8 18 8 20 20 C22 32 28 32 35 18" ${st(c)}/>`,
+s:c=>`<polygon points="9,6 31,6 9,34 31,34" ${st(c)}/>`,
+z:c=>`<polyline points="25,4 12,20 27,20 14,36" ${st(c)}/>`,
+ch:c=>`<polyline points="12,27 12,10 28,10 28,27" ${st(c)}/>`+L(5,27,35,27,c),
+j:c=>`<polygon points="15,8 25,8 34,32 6,32" ${st(c)}/>`,
+m:c=>`<rect x="7" y="9" width="26" height="10" rx="1.5" ${st(c)}/>`+L(20,19,20,30,c),
+n:c=>`<path d="M6 16 Q20 40 34 16" ${st(c)}/>`+dot(16,21,c)+dot(24,21,c),
+gn:c=>L(8,9,32,9,c)+[12,20,28].map(x=>L(x,9,x,32,c)).join(''),
+l:c=>`<path d="M25 6 A14 14 0 1 0 25 34 A11 11 0 1 1 25 6 Z" ${st(c)}/>`,
+r:c=>`<circle cx="20" cy="20" r="13" ${st(c)}/>`+L(7,20,33,20,c)+L(20,7,20,33,c),
+y:c=>L(20,4,20,20,c)+`<circle cx="20" cy="27" r="7" ${st(c)}/>`,
+w:c=>`<path d="M4 24 Q12 10 20 22 Q28 10 36 24" ${st(c)}/>`,
+a:c=>`<polyline points="8,7 20,19 32,7" ${st(c)}/>`+L(20,19,20,34,c),
+i:c=>L(4,29,36,29,c)+`<path d="M11 29 Q20 10 29 29" ${st(c)}/>`,
+'é':c=>L(20,6,20,34,c)+L(8,13,32,27,c)+L(8,27,32,13,c),
+'è':c=>`<polyline points="8,8 20,34 32,8" ${st(c)}/>`+L(20,34,20,6,c),
+o:c=>`<ellipse cx="20" cy="20" rx="14" ry="8" ${st(c)}/>`,
+ou:c=>`<polyline points="${spiral}" ${st(c)}/>`,
+u:c=>`<polyline points="6,28 18,12 18,28 30,12 30,28" ${st(c)}/>`,
+eu:c=>dot(14,26,c,2.6)+L(14,26,14,6,c)+L(14,26,30,26,c),
+an:c=>`<polygon points="6,7 34,7 20,24" ${st(c)}/>`+L(20,24,20,35,c),
+'in':c=>`<path d="M20 20 C14 10 4 10 4 20 C4 30 14 30 20 20 C26 10 36 10 36 20 C36 30 26 30 20 20 Z" ${st(c)}/>`,
+on:c=>`<path d="M5 33 C5 6 35 6 35 33" ${st(c)}/>`
+};
+
+/* ---- Chiffres (soroban) ---- */
+function dunder(n,x,c){const y=27;
+  if(n===0)return `<circle cx="${x}" cy="${y}" r="4.5" ${st(c)}/>`;
+  if(n===1)return dot(x,y,c,2.6);
+  if(n===2)return L(x-6,y,x+6,y,c);
+  if(n===3)return `<polyline points="${x-5},${y-5} ${x},${y+5} ${x+5},${y-5}" ${st(c)}/>`;
+  return L(x,y-6,x,y+6,c)+L(x-6,y,x+6,y,c);}
+function digits(str,c){const w=str.length*22+10;let o=`<line x1="5" y1="16" x2="${w-5}" y2="16" ${st(c)}/>`;[...str].forEach((d,i)=>{const n=+d,x=16+i*22;o+=dunder(n%5,x,c)+(n>=5?dot(x,9,c,2.6):'')});return [o,w];}
+
+/* ---- Saisie ---- */
+const CMAP={};
+['p','b','t','d','k','g','f','v','s','z','j','m','n','l','r','y','a','i','é','è','o','u'].forEach(k=>CMAP[k]=k);
+Object.assign(CMAP,{'â':'an','î':'in','ô':'on','û':'ou','ê':'eu','ĉ':'ch','x':'ch','ç':'ch','ĝ':'gn','ñ':'gn','q':'gn'});
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/\^c|c\^/g,'ĉ').replace(/\^g|g\^/g,'ĝ')
+    .replace(/\^a|a\^/g,'â').replace(/\^i|i\^/g,'î').replace(/\^o|o\^/g,'ô').replace(/\^u|u\^/g,'û').replace(/\^e|e\^/g,'ê');
+}
+function tokenize(s){
+  const lines=normalize(s).replace(/[ \t\u00a0\u202f]+([!?:;»])/g,'$1').replace(/«[ \t\u00a0\u202f]+/g,'«').split('\n');
+  return lines.map(line=>{
+    const words=[];let cur=[];
+    const push=()=>{if(cur.length){words.push(cur);cur=[]}};
+    const chars=[...line];
+    for(let i=0;i<chars.length;i++){
+      const ch=chars[i];
+      if(/\s/.test(ch)){push();continue}
+      if(/[0-9]/.test(ch)){let run=ch;while(i+1<chars.length&&/[0-9]/.test(chars[i+1]))run+=chars[++i];cur.push({t:'n',v:run});continue}
+      if(CMAP[ch]){cur.push({t:'s',v:CMAP[ch]});continue}
+      if(ch==='h')continue;
+      cur.push({t:'p',v:ch});
+    }
+    push();return words;
+  });
+}
+
+/* ---- Mise en page en un seul SVG ---- */
+const GAP=6,LH=50,PW=16;let SPACE=25;
+const BB={};
+function measure(){const ns='http://www.w3.org/2000/svg';const sv=document.createElementNS(ns,'svg');sv.setAttribute('width','0');sv.setAttribute('height','0');sv.style.position='absolute';sv.style.visibility='hidden';document.body.appendChild(sv);
+  for(const k in D){sv.innerHTML=`<g>${D[k]('#000')}</g>`;const b=sv.firstChild.getBBox();BB[k]=[b.x-1.1,b.width+2.2]}sv.remove();}
+function tokW(t){return t.t==='s'?BB[t.v][1]+GAP:t.t==='n'?digits(t.v,'#000')[1]+GAP:PW}
+function layout(lines,set,colors,maxW){
+  let y=0,maxX=0,body='';
+  lines.forEach(words=>{
+    let x=0;
+    if(!words.length){y+=LH*0.6;return}
+    words.forEach(w=>{
+      const ww=w.reduce((a,t)=>a+tokW(t),0);
+      if(x>0&&x+ww>maxW){x=0;y+=LH}
+      w.forEach(t=>{
+        if(t.t==='s'){const c=colors&&VOW.has(t.v)?colors.vowel:colors?colors.ink:inkOnly;body+=`<g transform="translate(${x-BB[t.v][0]},${y+5})">${set[t.v](c)}</g>`;x+=BB[t.v][1]+GAP}
+        else if(t.t==='n'){const[o,w2]=digits(t.v,colors?colors.digit:inkOnly);body+=`<g transform="translate(${x},${y+5})">${o}</g>`;x+=w2+GAP}
+        else{body+=`<text x="${x+PW/2}" y="${y+36}" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="26" fill="${colors?colors.ink:inkOnly}">${t.v.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</text>`;x+=PW}
+      });
+      maxX=Math.max(maxX,x);x+=SPACE;
+    });
+    y+=LH;
+  });
+  return {body,w:Math.max(maxX,40),h:Math.max(y,LH)};
+}
+let inkOnly='#1B2230';
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+
+/* ---- État ---- */
+const $=id=>document.getElementById(id);
+const src=$('src'),out=$('out'),size=$('size'),col=$('col'),msg=$('msg');
+let lastSVGs=[];
+function render(){
+  const ink=css('--ink'),vowel=css('--vowel'),digit=css('--digit');
+  inkOnly=ink;
+  const colors=col.checked?{ink,vowel,digit}:null;
+  const lines=tokenize(src.value);
+  const s=+size.value/40;
+  const avail=Math.max(200,out.clientWidth||600);
+  const maxW=avail/s;
+  const sets=[['Desson',D]];
+  lastSVGs=[];
+  out.innerHTML=sets.map(([name,set])=>{
+    const r=layout(lines,set,colors,maxW);
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${Math.ceil(r.w*s)}" height="${Math.ceil(r.h*s)}" viewBox="0 0 ${Math.ceil(r.w)} ${Math.ceil(r.h)}" role="img" aria-label="${name}">${r.body}</svg>`;
+    lastSVGs.push({name,svg,w:r.w*s,h:r.h*s});
+    return `<div class="block">${sets.length>1?`<span class="name">${name}</span>`:''}${svg}</div>`;
+  }).join('');
+}
+src.addEventListener('input',()=>{try{localStorage.setItem('code-src',src.value)}catch(e){}render()});
+size.addEventListener('input',render);
+const sp=$('sp'),spv=$('spv');
+function setSp(){SPACE=+sp.value/20;spv.textContent=sp.value+(sp.value==='500'?' (police)':'');render()}
+sp.addEventListener('input',setSp);col.addEventListener('change',render);
+window.addEventListener('resize',render);
+if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+$('copy').onclick=async()=>{
+  msg.textContent='';
+  try{
+    const pad=16,gap=14,scale=2;
+    const W=Math.max(...lastSVGs.map(o=>o.w))+pad*2;
+    const H=lastSVGs.reduce((a,o)=>a+o.h,0)+gap*(lastSVGs.length-1)+pad*2;
+    const cv=document.createElement('canvas');cv.width=Math.ceil(W*scale);cv.height=Math.ceil(H*scale);
+    const ctx=cv.getContext('2d');ctx.scale(scale,scale);ctx.fillStyle=css('--panel');ctx.fillRect(0,0,W,H);
+    let y=pad;
+    for(const o of lastSVGs){
+      const img=new Image();
+      await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(o.svg)});
+      ctx.drawImage(img,pad,y,o.w,o.h);y+=o.h+gap;
+    }
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    msg.textContent='Image copiée. Colle-la dans un message ou un document.';
+  }catch(e){
+    msg.textContent='Ce navigateur a refusé la copie d\'image. Fais une capture d\'écran du message codé.';
+  }
+};
+
+/* ---- Clé ---- */
+$('showkey').onclick=function(){const sec=$('keysec');const open=sec.hidden;sec.hidden=!open;this.setAttribute('aria-expanded',String(open));this.textContent=open?'Masquer la clé':'Afficher la clé';if(open)sec.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})};
+const REP={a:'arbre',i:'île','é':'étoile','è':'herbe',o:'ovale',ou:'ouragan',u:'usine',eu:'heure',an:'entonnoir','in':'infini',on:'pont',
+p:'poisson',b:'bateau',t:'toit',d:'dé',k:'canne',g:'goutte',f:'flûte',v:'vague',s:'sablier',z:'zigzag',ch:'chapeau',j:'jupe',m:'marteau',n:'nid',gn:'peigne',l:'lune',r:'roue',y:'yoyo'};
+const KEYS={an:'â',in:'î',on:'ô',ou:'û',eu:'ê',ch:'ĉ x ç',gn:'ĝ q ñ'};
+function g(set,k,c){return `<svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">${set[k](c)}</svg>`}
+function keyCard(k){const isV=VOW.has(k);const c=isV?'var(--vowel)':'currentColor';
+  const keys=(KEYS[k]||k).split(' ').map(x=>`<kbd>${x}</kbd>`).join('');
+  return `<div class="k"><span class="g">${g(D,k,c)}</span><span class="s">${k}${keys}</span><span class="w">${REP[k]}</span></div>`}
+$('kv').innerHTML=['a','i','é','è','o','ou','u','eu','an','in','on'].map(keyCard).join('');
+$('kc').innerHTML=['p','b','t','d','k','g','f','v','s','z','ch','j','m','n','gn','l','r','y'].map(keyCard).join('');
+$('kd').innerHTML=[0,1,2,3,4,5,6,7,8,9].map(n=>{const[o,w]=digits(String(n),'var(--digit)');return `<div class="k"><span class="g"><svg width="${w*34/40}" height="34" viewBox="0 0 ${w} 40" aria-hidden="true">${o}</svg></span><span class="s"><kbd>${n}</kbd></span><span class="w">${n<5?'':'perle du haut + '+(n-5)}</span></div>`}).join('');
+
+measure();
+try{const s=localStorage.getItem('code-src');if(s)src.value=s}catch(e){}
+SPACE=+sp.value/20;spv.textContent=sp.value+(sp.value==='500'?' (police)':'');
+render();
+})();
+</script>
+</body>
+</html>
