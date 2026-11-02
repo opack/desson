@@ -11,7 +11,7 @@
 :root{
   /* Outil : saisie en haut, rendu au centre, clé du clavier en bas. Papier froid, encre bleu-nuit. */
   --bg:#F2F4F7; --panel:#FFFFFF; --ink:#1B2230; --muted:#5D6675; --line:#DCE1E8;
-  --vowel:#D2552B; --digit:#1F64AD; --focus:#1F64AD;
+  --vowel:#D2552B; --digit:#1F64AD; --focus:#1F64AD; --ok:#1E7B3A; --bad:#C62828; --miss:#A87700;
   --display:"Bricolage Grotesque",system-ui,sans-serif;
   --body:"Atkinson Hyperlegible",system-ui,sans-serif;
   color-scheme:light;
@@ -19,12 +19,12 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#11151C; --panel:#1A2029; --ink:#E7EBF1; --muted:#9AA4B3; --line:#2C3441;
-    --vowel:#F08A62; --digit:#76AEEA; --focus:#76AEEA; color-scheme:dark;
+    --vowel:#F08A62; --digit:#76AEEA; --focus:#76AEEA; --ok:#5FD08A; --bad:#FF7B72; --miss:#F2C14E; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#11151C; --panel:#1A2029; --ink:#E7EBF1; --muted:#9AA4B3; --line:#2C3441;
-  --vowel:#F08A62; --digit:#76AEEA; --focus:#76AEEA; color-scheme:dark;
+  --vowel:#F08A62; --digit:#76AEEA; --focus:#76AEEA; --ok:#5FD08A; --bad:#FF7B72; --miss:#F2C14E; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -50,6 +50,29 @@ textarea:focus-visible,button:focus-visible,input:focus-visible{outline:2px soli
 a.btn{text-decoration:none;display:inline-block}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 [hidden]{display:none!important}
+.hidden-note{margin:0;padding:22px 12px;text-align:center;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:15px}
+.guess{display:flex;flex-direction:column;gap:10px}
+.guess textarea{min-height:72px}
+.score{font-size:14px;color:var(--muted)}
+.hint-game{margin:0;font-size:14px;color:var(--muted)}
+.game{display:flex;flex-direction:column;gap:14px}
+.gline{display:flex;flex-wrap:wrap;row-gap:14px;align-items:flex-start}
+.gword{display:flex;align-items:flex-start}
+.gcell{display:flex;flex-direction:column;align-items:center;gap:4px}
+.gcell.p span{display:flex;align-items:center;font-size:26px;line-height:1;color:var(--ink)}
+.gin-ro{color:var(--muted);background:transparent;border-style:dashed;cursor:default}
+.gcell svg{display:block}
+.gin{width:30px;height:32px;text-align:center;font:600 17px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:0}
+.gin:focus{outline:2px solid var(--focus);outline-offset:1px}
+.gcell.ok .gin{border-color:var(--ok);color:var(--ok)}
+.gcell.ko .gin{border-color:var(--bad);color:var(--bad)}
+.gcell.ok svg [stroke]{stroke:var(--ok)}
+.gcell.ok svg [fill]:not([fill="none"]){fill:var(--ok)}
+.gcell.ko svg [stroke]{stroke:var(--bad)}
+.gcell.ko svg [fill]:not([fill="none"]){fill:var(--bad)}
+.gcell.miss .gin{border-color:var(--miss);border-style:dashed;border-width:2px}
+.gcell.miss svg [stroke]{stroke:var(--miss)}
+.gcell.miss svg [fill]:not([fill="none"]){fill:var(--miss)}
 .msg{font-size:13px;color:var(--muted);margin:0}
 .msg:empty{display:none}
 .out{display:flex;flex-direction:column;gap:18px}
@@ -79,20 +102,26 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section class="panel" aria-labelledby="in-l">
     <label class="t" id="in-l" for="src">Ton message</label>
-    <textarea id="src" spellcheck="false">salu ! tu viî jûé o park a 15 êr ?
-ĉokola û gato ?</textarea>
+    <div id="srcwrap"><textarea id="src" spellcheck="false">salu ! tu viî jûé o park a 15 êr ?
+ĉokola û gato ?</textarea></div>
+    <p class="hidden-note" id="hidnote" hidden>Message caché : à toi de le déchiffrer !</p>
     <div class="bar">
       <label class="ctl" for="size">Taille <input type="range" id="size" min="22" max="64" value="38"></label>
       <label class="ctl" for="sp">Espace entre les mots <input type="range" id="sp" min="200" max="1000" step="20" value="500"> <output id="spv" for="sp" style="font-variant-numeric:tabular-nums;color:var(--ink);font-weight:700;min-width:7ch">500</output></label>
       <label class="ctl" for="col"><input type="checkbox" id="col" checked> Couleurs</label>
       <button type="button" class="btn" id="copy">Copier en image</button>
+      <button type="button" class="btn ghost" id="hidesrc" aria-pressed="false" aria-controls="srcwrap">Cacher le message</button>
       <button type="button" class="btn ghost" id="showkey" aria-expanded="false" aria-controls="keysec">Afficher la clé</button>
     </div>
     <p class="msg" id="msg" role="status"></p>
   </section>
 
-  <section class="panel" aria-label="Message codé">
+  <section class="panel" aria-label="Message codé" style="gap:16px">
     <div class="out" id="out"></div>
+    <div id="guesswrap" class="guess" hidden>
+      <p class="hint-game">Tape un caractère sous chaque symbole : le curseur avance tout seul.</p>
+      <div class="bar"><button type="button" class="btn" id="check">Vérifier</button><button type="button" class="btn ghost" id="clear">Effacer</button><span id="score" class="score" aria-live="polite"></span></div>
+    </div>
   </section>
 
   <section class="panel" id="keysec" aria-labelledby="key-h" hidden>
@@ -223,6 +252,7 @@ const $=id=>document.getElementById(id);
 const src=$('src'),out=$('out'),size=$('size'),col=$('col'),msg=$('msg');
 let lastSVGs=[];
 function render(){
+  if(GAME){renderGame();return}
   const ink=css('--ink'),vowel=css('--vowel'),digit=css('--digit');
   inkOnly=ink;
   const colors=col.checked?{ink,vowel,digit}:null;
@@ -269,6 +299,54 @@ $('copy').onclick=async()=>{
     msg.textContent='Ce navigateur a refusé la copie d\'image. Fais une capture d\'écran du message codé.';
   }
 };
+
+/* ---- Jeu : cacher le message ---- */
+$('hidesrc').onclick=function(){const hide=!$('srcwrap').hidden;$('srcwrap').hidden=hide;$('hidnote').hidden=!hide;$('guesswrap').hidden=!hide;
+  this.setAttribute('aria-pressed',String(hide));this.textContent=hide?'Montrer le message':'Cacher le message';
+  GAME=hide;out.innerHTML='';render();$('score').textContent='';
+  if(hide){const f=gins()[0];if(f)f.focus()}else src.focus()};
+
+/* Jeu : une case par symbole, comparaison directe son par son (x = ĉ, q = ĝ…). */
+let GAME=false;
+function renderGame(){
+  const prev=gins().map(x=>x.value);
+  const s=+size.value/40,lines=tokenize(src.value),colors=col.checked;
+  let i=0;
+  const cell=(svgBody,w,expect)=>{const k=i++;return `<div class="gcell" data-i="${k}"><svg width="${(w*s).toFixed(1)}" height="${(40*s).toFixed(1)}" viewBox="0 0 ${w} 40" aria-hidden="true">${svgBody}</svg><input class="gin" data-i="${k}" data-x="${expect}" maxlength="3" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Symbole ${k+1}" value="${(prev[k]||'').replace(/"/g,'&quot;')}"></div>`};
+  const html=lines.map(words=>`<div class="gline" style="column-gap:${(SPACE+GAP)*s}px">`+words.map(w=>`<div class="gword" style="gap:${GAP*s}px">`+w.map(t=>{
+    if(t.t==='s'){const c=colors&&VOW.has(t.v)?'var(--vowel)':'var(--ink)';const[bx,bw]=BB[t.v];return cell(`<g transform="translate(${-bx},0)">${D[t.v](c)}</g>`,bw,t.v)}
+    if(t.t==='n'){const c=colors?'var(--digit)':'var(--ink)';const dw=Math.max(DIGIT_W,34/s);return `<div class="gword">`+[...t.v].map(d=>cell(`<line x1="0" y1="16" x2="${dw}" y2="16" ${st(c)} stroke-linecap="butt"/><g transform="translate(${(dw-DIGIT_W)/2},0)">${DG[+d](c)}</g>`,dw,'#'+d)).join('')+`</div>`}
+    const pv=t.v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+    return `<div class="gcell p"><span style="height:${(40*s).toFixed(1)}px">${pv}</span><input class="gin gin-ro" value="${pv}" readonly tabindex="-1" aria-hidden="true"></div>`;
+  }).join('')+`</div>`).join('')+`</div>`).join('');
+  out.innerHTML=`<div class="game">${html}</div>`;
+}
+function gins(){return [...out.querySelectorAll('.gin:not(.gin-ro)')]}
+function soundOf(v){const n=normalize(v);if(/^[0-9]$/.test(n))return '#'+n;return CMAP[n]||null}
+function clearMarks(){out.querySelectorAll('.gcell.ok,.gcell.ko,.gcell.miss').forEach(c=>c.classList.remove('ok','ko','miss'));$('score').textContent=''}
+out.addEventListener('input',e=>{
+  const el=e.target;if(!el.classList||!el.classList.contains('gin'))return;
+  clearMarks();
+  let v=normalize(el.value);
+  if(v.endsWith('^')){el.value='^';return}           /* touche morte : on attend la lettre */
+  v=[...v].pop()||'';el.value=v;
+  if(v){const all=gins(),k=all.indexOf(el);if(all[k+1])all[k+1].focus()}
+});
+out.addEventListener('keydown',e=>{
+  const el=e.target;if(!el.classList||!el.classList.contains('gin'))return;
+  const all=gins(),k=all.indexOf(el);
+  if(e.key==='Backspace'&&!el.value&&k>0){e.preventDefault();all[k-1].value='';all[k-1].focus();clearMarks()}
+  else if(e.key==='ArrowLeft'&&k>0){e.preventDefault();all[k-1].focus()}
+  else if((e.key==='ArrowRight'||e.key==='Enter')&&all[k+1]){e.preventDefault();all[k+1].focus()}
+});
+out.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('gin'))e.target.select()});
+$('check').onclick=()=>{
+  const all=gins();let good=0,miss=0;clearMarks();
+  all.forEach(el=>{const st=!el.value?'miss':soundOf(el.value)===el.dataset.x?'ok':'ko';if(st==='ok')good++;if(st==='miss')miss++;el.parentElement.classList.add(st)});
+  const bad=all.length-good-miss;
+  $('score').textContent=good===all.length?'Bravo, tout est juste !':`${good} juste${good>1?'s':''}`+(bad?`, ${bad} faux`:'')+(miss?`, ${miss} manquant${miss>1?'s':''}`:'')+` sur ${all.length}`;
+};
+$('clear').onclick=()=>{gins().forEach(el=>el.value='');clearMarks();const f=gins()[0];if(f)f.focus()};
 
 /* ---- Clé ---- */
 $('showkey').onclick=function(){const sec=$('keysec');const open=sec.hidden;sec.hidden=!open;this.setAttribute('aria-expanded',String(open));this.textContent=open?'Masquer la clé':'Afficher la clé';if(open)sec.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})};
