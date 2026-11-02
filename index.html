@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Desson</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Outil : saisie en haut, rendu au centre, clé du clavier en bas. Papier froid, encre bleu-nuit. */
+  --bg:#F2F4F7; --panel:#FFFFFF; --ink:#1B2230; --muted:#5D6675; --line:#DCE1E8;
+  --vowel:#D2552B; --digit:#1F64AD; --focus:#1F64AD;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11151C; --panel:#1A2029; --ink:#E7EBF1; --muted:#9AA4B3; --line:#2C3441;
+    --vowel:#F08A62; --digit:#76AEEA; --focus:#76AEEA; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11151C; --panel:#1A2029; --ink:#E7EBF1; --muted:#9AA4B3; --line:#2C3441;
+  --vowel:#F08A62; --digit:#76AEEA; --focus:#76AEEA; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 48px;display:flex;flex-direction:column;gap:22px}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:500;font-size:19px;margin:0}
+.lead{color:var(--muted);margin:6px 0 0;max-width:65ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
+label.t{font-weight:700;font-size:14px}
+textarea{width:100%;min-height:96px;resize:vertical;font:18px/1.5 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+textarea:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted)}
+.hint code{font-family:ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--ink)}
+.bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:600 14px var(--body);background:transparent;color:var(--ink);border:0;padding:7px 14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.ctl{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.btn{font:600 14px var(--body);background:var(--ink);color:var(--panel);border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+[hidden]{display:none!important}
+.msg{font-size:13px;color:var(--muted);margin:0}
+.msg:empty{display:none}
+.out{display:flex;flex-direction:column;gap:18px}
+.out .block{display:flex;flex-direction:column;gap:6px}
+.out .name{font-size:13px;font-weight:700;color:var(--muted);text-transform:none}
+.out svg{display:block;max-width:100%;height:auto}
+.key{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.k{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.k .g{grid-row:1 / span 2;display:flex;gap:2px}
+.k .s{font-weight:700;font-size:15px;display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px}
+.k .s kbd{font:600 13px ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--ink)}
+.k .w{font-size:12px;color:var(--muted)}
+.sub{font-size:14px;font-weight:700;color:var(--muted);margin:4px 0 0}
+@media (max-width:420px){h1{font-size:25px}.wrap{padding:20px 16px 40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Desson</h1>
+    <p class="lead">Tape ton message comme il se prononce, un caractère par son : il s'affiche aussitôt en desson.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="in-l">
+    <label class="t" id="in-l" for="src">Ton message</label>
+    <textarea id="src" spellcheck="false">salu ! tu viî jûé o park a 15 êr ?
+ĉokola û gato ?</textarea>
+    <div class="bar">
+      <label class="ctl" for="size">Taille <input type="range" id="size" min="22" max="64" value="38"></label>
+      <label class="ctl" for="sp">Espace entre les mots <input type="range" id="sp" min="200" max="1000" step="20" value="500"> <output id="spv" for="sp" style="font-variant-numeric:tabular-nums;color:var(--ink);font-weight:700;min-width:7ch">500</output></label>
+      <label class="ctl" for="col"><input type="checkbox" id="col" checked> Couleurs</label>
+      <button type="button" class="btn" id="copy">Copier en image</button>
+      <button type="button" class="btn ghost" id="showkey" aria-expanded="false" aria-controls="keysec">Afficher la clé</button>
+    </div>
+    <p class="msg" id="msg" role="status"></p>
+  </section>
+
+  <section class="panel" aria-label="Message codé">
+    <div class="out" id="out"></div>
+  </section>
+
+  <section class="panel" id="keysec" aria-labelledby="key-h" hidden>
+    <h2 id="key-h">La clé : quelle touche pour quel son</h2>
+    <p class="sub">Voyelles</p>
+    <div class="key" id="kv"></div>
+    <p class="sub">Consonnes</p>
+    <div class="key" id="kc"></div>
+    <p class="sub">Chiffres (barre du soroban, point au-dessus = +5)</p>
+    <div class="key" id="kd"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+const st=(c,w)=>`fill="none" stroke="${c}" stroke-width="${w||2.2}" stroke-linecap="round" stroke-linejoin="round"`;
+
+/* DESSON:GENERATED:BEGIN */
+/* Généré par src/build_page.py à partir de src/desson.py : ne pas modifier à la main. */
+const VOWELS=["a", "i", "é", "è", "o", "ou", "u", "eu", "an", "in", "on"],CONSONANTS=["p", "b", "t", "d", "k", "g", "f", "v", "s", "z", "ch", "j", "m", "n", "gn", "l", "r", "y"];
+const D={
+"p":c=>`<path d="M35 11 C26 30 8 30 8 20 C8 10 26 10 35 29" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"b":c=>`<path d="M5 15 L35 15 A15 15 0 0 1 5 15 Z" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"t":c=>`<polyline points="7,29 20,10 33,29" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"d":c=>`<polygon points="20,5 32,20 20,35 8,20" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"k":c=>`<path d="M25 34 L25 14 Q25 7 18.5 7 Q12 7 12 14" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"g":c=>`<path d="M5 12 Q8 26 20 26 Q32 26 35 12" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="26" x2="20" y2="35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"f":c=>`<polyline points="12,4 12,16 28,16 28,4" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="4" x2="20" y2="36" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"v":c=>`<path d="M5 22 C12 8 18 8 20 20 C22 32 28 32 35 18" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"s":c=>`<polygon points="9,6 31,6 9,34 31,34" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"z":c=>`<polyline points="25,4 12,20 27,20 14,36" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"ch":c=>`<polyline points="12,27 12,10 28,10 28,27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="27" x2="35" y2="27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"j":c=>`<polyline points="5,8 12,5 12,35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12,24 31,24 31,35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"m":c=>`<polyline points="10,4 20,18 30,4" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="26" r="8" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"n":c=>`<path d="M6 16 Q20 40 34 16" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="21" r="2.0" fill="${c}"/><circle cx="24" cy="21" r="2.0" fill="${c}"/>`,
+"gn":c=>`<line x1="8" y1="9" x2="32" y2="9" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="32" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="9" x2="20" y2="32" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="28" y1="9" x2="28" y2="32" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"l":c=>`<path d="M25 6 A14 14 0 1 0 25 34 A11 11 0 1 1 25 6 Z" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"r":c=>`<circle cx="20" cy="20" r="13" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="7" y1="20" x2="33" y2="20" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="7" x2="20" y2="33" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"y":c=>`<line x1="20" y1="4" x2="20" y2="20" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="27" r="7" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"a":c=>`<rect x="10" y="5" width="20" height="30" rx="1" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="5" x2="20" y2="35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"i":c=>`<line x1="4" y1="29" x2="36" y2="29" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 29 Q20 10 29 29" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"é":c=>`<line x1="20" y1="6" x2="20" y2="34" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="13" x2="32" y2="27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="27" x2="32" y2="13" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"è":c=>`<polyline points="8,8 20,34 32,8" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="34" x2="20" y2="6" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"o":c=>`<ellipse cx="20" cy="20" rx="14" ry="8" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"ou":c=>`<polyline points="22.0,20.0 22.2,20.3 22.3,20.6 22.4,21.0 22.4,21.4 22.3,21.8 22.2,22.2 22.0,22.6 21.7,23.0 21.4,23.4 21.0,23.7 20.5,24.0 20.0,24.2 19.4,24.3 18.8,24.4 18.2,24.4 17.5,24.3 16.9,24.1 16.3,23.7 15.6,23.3 15.1,22.8 14.6,22.2 14.2,21.6 13.8,20.8 13.6,20.0 13.5,19.1 13.5,18.2 13.6,17.3 13.8,16.4 14.2,15.5 14.7,14.7 15.3,13.9 16.1,13.2 16.9,12.6 17.9,12.0 18.9,11.7 20.0,11.4 21.1,11.3 22.3,11.3 23.5,11.5 24.7,11.9 25.8,12.4 26.9,13.1 27.8,14.0 28.7,15.0 29.5,16.1 30.1,17.3 30.5,18.6 30.8,20.0 30.9,21.4 30.8,22.9 30.5,24.3 30.0,25.8 29.3,27.1 28.4,28.4 27.4,29.6 26.1,30.6 24.8,31.5 23.3,32.2 21.7,32.7 20.0,33.0" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"u":c=>`<polyline points="6,28 18,12 18,28 30,12 30,28" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"eu":c=>`<circle cx="14" cy="26" r="2.6" fill="${c}"/><line x1="14" y1="26" x2="14" y2="6" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="14" y1="26" x2="30" y2="26" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"an":c=>`<polygon points="6,7 34,7 20,24" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="24" x2="20" y2="35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"in":c=>`<path d="M20 20 C14 10 4 10 4 20 C4 30 14 30 20 20 C26 10 36 10 36 20 C36 30 26 30 20 20 Z" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"on":c=>`<path d="M5 33 C5 6 35 6 35 33" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+};
+const DIGIT_W=22;
+const DG=[
+c=>`<circle cx="11.0" cy="27" r="4.5" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+c=>`<circle cx="11.0" cy="27" r="2.6" fill="${c}"/>`,
+c=>`<line x1="5.0" y1="27" x2="17.0" y2="27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+c=>`<polyline points="6.0,22 11.0,32 16.0,22" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+c=>`<line x1="11.0" y1="21" x2="11.0" y2="33" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="5.0" y1="27" x2="17.0" y2="27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+c=>`<circle cx="11.0" cy="27" r="4.5" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.0" cy="9" r="2.6" fill="${c}"/>`,
+c=>`<circle cx="11.0" cy="27" r="2.6" fill="${c}"/><circle cx="11.0" cy="9" r="2.6" fill="${c}"/>`,
+c=>`<line x1="5.0" y1="27" x2="17.0" y2="27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.0" cy="9" r="2.6" fill="${c}"/>`,
+c=>`<polyline points="6.0,22 11.0,32 16.0,22" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.0" cy="9" r="2.6" fill="${c}"/>`,
+c=>`<line x1="11.0" y1="21" x2="11.0" y2="33" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="5.0" y1="27" x2="17.0" y2="27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.0" cy="9" r="2.6" fill="${c}"/>`,
+];
+const CMAP={"p": "p", "b": "b", "t": "t", "d": "d", "k": "k", "g": "g", "f": "f", "v": "v", "s": "s", "z": "z", "j": "j", "m": "m", "n": "n", "l": "l", "r": "r", "y": "y", "a": "a", "i": "i", "é": "é", "è": "è", "o": "o", "u": "u", "â": "an", "î": "in", "ô": "on", "û": "ou", "ê": "eu", "ĉ": "ch", "ĝ": "gn", "x": "ch", "ç": "ch", "q": "gn", "ñ": "gn"};
+const KEYS={"p": ["p"], "b": ["b"], "t": ["t"], "d": ["d"], "k": ["k"], "g": ["g"], "f": ["f"], "v": ["v"], "s": ["s"], "z": ["z"], "ch": ["ĉ", "x", "ç"], "j": ["j"], "m": ["m"], "n": ["n"], "gn": ["ĝ", "q", "ñ"], "l": ["l"], "r": ["r"], "y": ["y"], "a": ["a"], "i": ["i"], "é": ["é"], "è": ["è"], "o": ["o"], "ou": ["û"], "u": ["u"], "eu": ["ê"], "an": ["â"], "in": ["î"], "on": ["ô"]};
+const HOOKS={"p": "poisson", "b": "bol", "t": "toit", "d": "diamant", "k": "canne", "g": "guidon", "f": "fourchette", "v": "vague", "s": "sablier", "z": "zigzag", "ch": "chapeau", "j": "girafe", "m": "médaille", "n": "nid", "gn": "peigne", "l": "lune", "r": "roue", "y": "yoyo", "a": "armoire", "i": "île", "é": "étoile", "è": "herbe", "o": "ovale", "ou": "ouragan", "u": "usine", "eu": "heure", "an": "entonnoir", "in": "infini", "on": "pont"};
+/* DESSON:GENERATED:END */
+const VOW=new Set(VOWELS);
+
+/* ---- Chiffres (soroban) : une barre commune, chaque chiffre DG[n] dessiné autour de x = DIGIT_W/2 ---- */
+function digits(str,c){const w=str.length*DIGIT_W+10;let o=`<line x1="5" y1="16" x2="${w-5}" y2="16" ${st(c)}/>`;[...str].forEach((d,i)=>{o+=`<g transform="translate(${5+i*DIGIT_W},0)">${DG[+d](c)}</g>`});return [o,w];}
+
+/* ---- Saisie ---- */
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/\^c|c\^/g,'ĉ').replace(/\^g|g\^/g,'ĝ')
+    .replace(/\^a|a\^/g,'â').replace(/\^i|i\^/g,'î').replace(/\^o|o\^/g,'ô').replace(/\^u|u\^/g,'û').replace(/\^e|e\^/g,'ê');
+}
+function tokenize(s){
+  const lines=normalize(s).replace(/[ \t\u00a0\u202f]+([!?:;»])/g,'$1').replace(/«[ \t\u00a0\u202f]+/g,'«').split('\n');
+  return lines.map(line=>{
+    const words=[];let cur=[];
+    const push=()=>{if(cur.length){words.push(cur);cur=[]}};
+    const chars=[...line];
+    for(let i=0;i<chars.length;i++){
+      const ch=chars[i];
+      if(/\s/.test(ch)){push();continue}
+      if(/[0-9]/.test(ch)){let run=ch;while(i+1<chars.length&&/[0-9]/.test(chars[i+1]))run+=chars[++i];cur.push({t:'n',v:run});continue}
+      if(CMAP[ch]){cur.push({t:'s',v:CMAP[ch]});continue}
+      if(ch==='h')continue;
+      cur.push({t:'p',v:ch});
+    }
+    push();return words;
+  });
+}
+
+/* ---- Mise en page en un seul SVG ---- */
+const GAP=6,LH=50,PW=16;let SPACE=25;
+const BB={};
+function measure(){const ns='http://www.w3.org/2000/svg';const sv=document.createElementNS(ns,'svg');sv.setAttribute('width','0');sv.setAttribute('height','0');sv.style.position='absolute';sv.style.visibility='hidden';document.body.appendChild(sv);
+  for(const k in D){sv.innerHTML=`<g>${D[k]('#000')}</g>`;const b=sv.firstChild.getBBox();BB[k]=[b.x-1.1,b.width+2.2]}sv.remove();}
+function tokW(t){return t.t==='s'?BB[t.v][1]+GAP:t.t==='n'?digits(t.v,'#000')[1]+GAP:PW}
+function layout(lines,set,colors,maxW){
+  let y=0,maxX=0,body='';
+  lines.forEach(words=>{
+    let x=0;
+    if(!words.length){y+=LH*0.6;return}
+    words.forEach(w=>{
+      const ww=w.reduce((a,t)=>a+tokW(t),0);
+      if(x>0&&x+ww>maxW){x=0;y+=LH}
+      w.forEach(t=>{
+        if(t.t==='s'){const c=colors&&VOW.has(t.v)?colors.vowel:colors?colors.ink:inkOnly;body+=`<g transform="translate(${x-BB[t.v][0]},${y+5})">${set[t.v](c)}</g>`;x+=BB[t.v][1]+GAP}
+        else if(t.t==='n'){const[o,w2]=digits(t.v,colors?colors.digit:inkOnly);body+=`<g transform="translate(${x},${y+5})">${o}</g>`;x+=w2+GAP}
+        else{body+=`<text x="${x+PW/2}" y="${y+36}" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="26" fill="${colors?colors.ink:inkOnly}">${t.v.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</text>`;x+=PW}
+      });
+      maxX=Math.max(maxX,x);x+=SPACE;
+    });
+    y+=LH;
+  });
+  return {body,w:Math.max(maxX,40),h:Math.max(y,LH)};
+}
+let inkOnly='#1B2230';
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+
+/* ---- État ---- */
+const $=id=>document.getElementById(id);
+const src=$('src'),out=$('out'),size=$('size'),col=$('col'),msg=$('msg');
+let lastSVGs=[];
+function render(){
+  const ink=css('--ink'),vowel=css('--vowel'),digit=css('--digit');
+  inkOnly=ink;
+  const colors=col.checked?{ink,vowel,digit}:null;
+  const lines=tokenize(src.value);
+  const s=+size.value/40;
+  const avail=Math.max(200,out.clientWidth||600);
+  const maxW=avail/s;
+  const sets=[['Desson',D]];
+  lastSVGs=[];
+  out.innerHTML=sets.map(([name,set])=>{
+    const r=layout(lines,set,colors,maxW);
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${Math.ceil(r.w*s)}" height="${Math.ceil(r.h*s)}" viewBox="0 0 ${Math.ceil(r.w)} ${Math.ceil(r.h)}" role="img" aria-label="${name}">${r.body}</svg>`;
+    lastSVGs.push({name,svg,w:r.w*s,h:r.h*s});
+    return `<div class="block">${sets.length>1?`<span class="name">${name}</span>`:''}${svg}</div>`;
+  }).join('');
+}
+src.addEventListener('input',()=>{try{localStorage.setItem('code-src',src.value)}catch(e){}render()});
+size.addEventListener('input',render);
+const sp=$('sp'),spv=$('spv');
+function setSp(){SPACE=+sp.value/20;spv.textContent=sp.value+(sp.value==='500'?' (police)':'');render()}
+sp.addEventListener('input',setSp);col.addEventListener('change',render);
+window.addEventListener('resize',render);
+if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+$('copy').onclick=async()=>{
+  msg.textContent='';
+  try{
+    const pad=16,gap=14,scale=2;
+    const W=Math.max(...lastSVGs.map(o=>o.w))+pad*2;
+    const H=lastSVGs.reduce((a,o)=>a+o.h,0)+gap*(lastSVGs.length-1)+pad*2;
+    const cv=document.createElement('canvas');cv.width=Math.ceil(W*scale);cv.height=Math.ceil(H*scale);
+    const ctx=cv.getContext('2d');ctx.scale(scale,scale);ctx.fillStyle=css('--panel');ctx.fillRect(0,0,W,H);
+    let y=pad;
+    for(const o of lastSVGs){
+      const img=new Image();
+      await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(o.svg)});
+      ctx.drawImage(img,pad,y,o.w,o.h);y+=o.h+gap;
+    }
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    msg.textContent='Image copiée. Colle-la dans un message ou un document.';
+  }catch(e){
+    msg.textContent='Ce navigateur a refusé la copie d\'image. Fais une capture d\'écran du message codé.';
+  }
+};
+
+/* ---- Clé ---- */
+$('showkey').onclick=function(){const sec=$('keysec');const open=sec.hidden;sec.hidden=!open;this.setAttribute('aria-expanded',String(open));this.textContent=open?'Masquer la clé':'Afficher la clé';if(open)sec.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})};
+function g(set,k,c){return `<svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">${set[k](c)}</svg>`}
+function keyCard(k){const isV=VOW.has(k);const c=isV?'var(--vowel)':'currentColor';
+  const keys=KEYS[k].map(x=>`<kbd>${x}</kbd>`).join('');
+  return `<div class="k"><span class="g">${g(D,k,c)}</span><span class="s">${k}${keys}</span><span class="w">${HOOKS[k]}</span></div>`}
+$('kv').innerHTML=VOWELS.map(keyCard).join('');
+$('kc').innerHTML=CONSONANTS.map(keyCard).join('');
+$('kd').innerHTML=[0,1,2,3,4,5,6,7,8,9].map(n=>{const[o,w]=digits(String(n),'var(--digit)');return `<div class="k"><span class="g"><svg width="${w*34/40}" height="34" viewBox="0 0 ${w} 40" aria-hidden="true">${o}</svg></span><span class="s"><kbd>${n}</kbd></span><span class="w">${n<5?'':'perle du haut + '+(n-5)}</span></div>`}).join('');
+
+measure();
+try{const s=localStorage.getItem('code-src');if(s)src.value=s}catch(e){}
+SPACE=+sp.value/20;spv.textContent=sp.value+(sp.value==='500'?' (police)':'');
+render();
+})();
+</script>
+</body>
+</html>
