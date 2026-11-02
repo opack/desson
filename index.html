@@ -46,6 +46,8 @@ textarea:focus-visible,button:focus-visible,input:focus-visible{outline:2px soli
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
 .ctl{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
 .btn{font:600 14px var(--body);background:var(--ink);color:var(--panel);border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+.dl{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+a.btn{text-decoration:none;display:inline-block}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 [hidden]{display:none!important}
 .msg{font-size:13px;color:var(--muted);margin:0}
@@ -69,6 +71,10 @@ textarea:focus-visible,button:focus-visible,input:focus-visible{outline:2px soli
   <header>
     <h1>Desson</h1>
     <p class="lead">Tape ton message comme il se prononce, un caractère par son : il s'affiche aussitôt en desson.</p>
+    <nav class="dl" aria-label="Téléchargements">
+      <a class="btn ghost" href="Desson-Regular.ttf" download>Télécharger la police</a>
+      <a class="btn ghost" href="desson-guide.pdf" download>Télécharger le guide (PDF)</a>
+    </nav>
   </header>
 
   <section class="panel" aria-labelledby="in-l">
