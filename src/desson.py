@@ -43,7 +43,7 @@ GLYPHS = {
     'ch': lambda c: f'<polyline points="12,27 12,10 28,10 28,27" {_st(c)}/>' + _line(5, 27, 35, 27, c),
     'j': lambda c: f'<polyline points="5,8 12,5 12,35" {_st(c)}/>' + f'<polyline points="12,24 31,24 31,35" {_st(c)}/>',
     'm': lambda c: f'<polyline points="10,4 20,18 30,4" {_st(c)}/>' + f'<circle cx="20" cy="26" r="8" {_st(c)}/>',
-    'n': lambda c: f'<path d="M6 16 Q20 40 34 16" {_st(c)}/>' + _dot(16, 21, c) + _dot(24, 21, c),
+    'n': lambda c: f'<path d="M4 28 L15 28 C27 28 28 10 20 10 C12 10 13 28 25 28 L36 28" {_st(c)}/>',  # corde nouée
     'gn': lambda c: _line(8, 9, 32, 9, c) + ''.join(_line(x, 9, x, 32, c) for x in (12, 20, 28)),
     'l': lambda c: f'<path d="M25 6 A14 14 0 1 0 25 34 A11 11 0 1 1 25 6 Z" {_st(c)}/>',
     'r': lambda c: f'<circle cx="20" cy="20" r="13" {_st(c)}/>' + _line(7, 20, 33, 20, c) + _line(20, 7, 20, 33, c),
@@ -68,7 +68,7 @@ VOWELS = ['a', 'i', 'é', 'è', 'o', 'ou', 'u', 'eu', 'an', 'in', 'on']
 # objet-repère de chaque son
 HOOKS = {
     'p': 'poisson', 'b': 'bol', 't': 'toit', 'd': 'diamant', 'k': 'canne', 'g': 'guidon', 'f': 'fourchette',
-    'v': 'vague', 's': 'sablier', 'z': 'zigzag', 'ch': 'chapeau', 'j': 'girafe', 'm': 'médaille', 'n': 'nid',
+    'v': 'vague', 's': 'sablier', 'z': 'zigzag', 'ch': 'chapeau', 'j': 'girafe', 'm': 'médaille', 'n': 'nœud',
     'gn': 'peigne', 'l': 'lune', 'r': 'roue', 'y': 'yoyo',
     'a': 'armoire', 'i': 'île', 'é': 'étoile', 'è': 'herbe', 'o': 'ovale', 'ou': 'ouragan', 'u': 'usine',
     'eu': 'heure', 'an': 'entonnoir', 'in': 'infini', 'on': 'pont',
