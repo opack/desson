@@ -79,7 +79,7 @@ h2{{font-size:15px;margin:14px 0 6px}} p,li{{line-height:1.45;color:#444}}
 </style></head><body>
 <h1>Desson</h1><p class="sub">Des sons dessinés : un dessin par son.</p>
 <p>On écrit les <b>sons</b>, pas les lettres. Chaque son a son dessin : un objet dont le nom commence par ce son
-(sauf le peigne et le pont, où on l'entend à la fin). Un seul signe pour les deux « eu » (peu, peur).
+(sauf le peigne, où on l'entend à la fin). Un seul signe pour les deux « eu » (peu, peur).
 Au clavier, un caractère par son : le circonflexe marque les sons composés (â an, î in, ô on, û ou, ê eu, ĉ ch, ĝ gn) ;
 en secours (touches en pointillés), x ou ç pour ch, q ou ñ pour gn.</p>
 <h2>Les consonnes</h2><div class="g">{cons}</div>

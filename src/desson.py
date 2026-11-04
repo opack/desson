@@ -40,8 +40,8 @@ GLYPHS = {
     'v': lambda c: f'<path d="M5 22 C12 8 18 8 20 20 C22 32 28 32 35 18" {_st(c)}/>',
     's': lambda c: f'<polygon points="9,6 31,6 9,34 31,34" {_st(c)}/>',
     'z': lambda c: f'<polyline points="25,4 12,20 27,20 14,36" {_st(c)}/>',
-    'ch': lambda c: f'<polyline points="12,27 12,10 28,10 28,27" {_st(c)}/>' + _line(5, 27, 35, 27, c),
-    'j': lambda c: f'<polyline points="5,8 12,5 12,35" {_st(c)}/>' + f'<polyline points="12,24 31,24 31,35" {_st(c)}/>',
+    'ch': lambda c: _line(12, 5, 12, 35, c) + f'<polyline points="12,24 31,24 31,35" {_st(c)}/>',  # chaise de profil
+    'j': lambda c: f'<polygon points="15,8 25,8 34,32 6,32" {_st(c)}/>',  # jupe
     'm': lambda c: f'<path d="M4 9 Q16 5 20 33 Q24 5 36 9" {_st(c)}/>',  # mouette, ailes bombées
     'n': lambda c: f'<path d="M4 28 L15 28 C27 28 28 10 20 10 C12 10 13 28 25 28 L36 28" {_st(c)}/>',  # corde nouée
     'gn': lambda c: _line(8, 9, 32, 9, c) + ''.join(_line(x, 9, x, 32, c) for x in (12, 20, 28)),
@@ -59,7 +59,7 @@ GLYPHS = {
     'eu': lambda c: _dot(14, 26, c, 2.6) + _line(14, 26, 14, 6, c) + _line(14, 26, 30, 26, c),
     'an': lambda c: f'<polygon points="6,7 34,7 20,24" {_st(c)}/>' + _line(20, 24, 20, 35, c),
     'in': lambda c: f'<path d="M20 20 C14 10 4 10 4 20 C4 30 14 30 20 20 C26 10 36 10 36 20 C36 30 26 30 20 20 Z" {_st(c)}/>',
-    'on': lambda c: f'<path d="M5 33 C5 6 35 6 35 33" {_st(c)}/>',
+    'on': lambda c: f'<path d="M11 33 C11 5 29 5 29 33 Q20 26 11 33 Z" {_st(c)}/>',  # ongle : arche étroite fermée par un arc vers le haut
 }
 
 CONSONANTS = ['p', 'b', 't', 'd', 'k', 'g', 'f', 'v', 's', 'z', 'ch', 'j', 'm', 'n', 'gn', 'l', 'r', 'y']
@@ -68,10 +68,10 @@ VOWELS = ['a', 'i', 'é', 'è', 'o', 'ou', 'u', 'eu', 'an', 'in', 'on']
 # objet-repère de chaque son
 HOOKS = {
     'p': 'poisson', 'b': 'bol', 't': 'toit', 'd': 'diamant', 'k': 'canne', 'g': 'guidon', 'f': 'fourchette',
-    'v': 'vague', 's': 'sablier', 'z': 'zigzag', 'ch': 'chapeau', 'j': 'girafe', 'm': 'mouette', 'n': 'nœud',
+    'v': 'vague', 's': 'sablier', 'z': 'zigzag', 'ch': 'chaise', 'j': 'jupe', 'm': 'mouette', 'n': 'nœud',
     'gn': 'peigne', 'l': 'lune', 'r': 'roue', 'y': 'yoyo',
     'a': 'armoire', 'i': 'île', 'é': 'étoile', 'è': 'herbe', 'o': 'ovale', 'ou': 'ouragan', 'u': 'usine',
-    'eu': 'heure', 'an': 'entonnoir', 'in': 'infini', 'on': 'pont',
+    'eu': 'heure', 'an': 'entonnoir', 'in': 'infini', 'on': 'ongle',
 }
 
 # caractère tapé -> son. Règle : un caractère = un son ; le circonflexe marque les sons composés.

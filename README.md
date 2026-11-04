@@ -13,7 +13,7 @@ On écrit ce qu'on entend, sans les lettres muettes.
 ## Les règles
 
 - **29 sons**, un dessin par son. Chaque dessin représente un objet dont le nom commence par ce son
-  (exceptions : le *peigne* pour « gn » et le *pont* pour « on »).
+  (exception : le *peigne* pour « gn »).
 - Un seul signe pour les deux « eu » (*peu*, *peur*). Pas de « w » : « oi » s'écrit « ou » + « a ».
 - On écrit ce qu'on entend : `i` dans `viî` (viens) ou `pié` (pied), `y` dans `yê` (yeux), `yaûrt` (yaourt) ou `travay` (travail).
 - **Chiffres façon soroban** : chaque chiffre est posé sous une barre (petit rond = 0, point = 1, trait = 2,
@@ -61,7 +61,7 @@ précédente, la désinstaller d'abord, puis redémarrer Word (ou le PC) pour vi
 cd src
 pip install -r requirements.txt
 playwright install chromium        # une seule fois, pour le guide PDF
-python make.py --version 1.500     # augmenter la version de la police à chaque changement
+python make.py --version 2.000     # augmenter la version de la police à chaque changement
 ```
 
 - `src/desson.py` : les dessins (SVG dans une case de 40 × 40), les objets-repères, la saisie clavier et les chiffres.

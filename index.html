@@ -157,8 +157,8 @@ const D={
 "v":c=>`<path d="M5 22 C12 8 18 8 20 20 C22 32 28 32 35 18" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
 "s":c=>`<polygon points="9,6 31,6 9,34 31,34" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
 "z":c=>`<polyline points="25,4 12,20 27,20 14,36" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
-"ch":c=>`<polyline points="12,27 12,10 28,10 28,27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="27" x2="35" y2="27" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
-"j":c=>`<polyline points="5,8 12,5 12,35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12,24 31,24 31,35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"ch":c=>`<line x1="12" y1="5" x2="12" y2="35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12,24 31,24 31,35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"j":c=>`<polygon points="15,8 25,8 34,32 6,32" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
 "m":c=>`<path d="M4 9 Q16 5 20 33 Q24 5 36 9" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
 "n":c=>`<path d="M4 28 L15 28 C27 28 28 10 20 10 C12 10 13 28 25 28 L36 28" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
 "gn":c=>`<line x1="8" y1="9" x2="32" y2="9" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="32" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="9" x2="20" y2="32" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="28" y1="9" x2="28" y2="32" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
@@ -175,7 +175,7 @@ const D={
 "eu":c=>`<circle cx="14" cy="26" r="2.6" fill="${c}"/><line x1="14" y1="26" x2="14" y2="6" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="14" y1="26" x2="30" y2="26" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
 "an":c=>`<polygon points="6,7 34,7 20,24" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="24" x2="20" y2="35" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
 "in":c=>`<path d="M20 20 C14 10 4 10 4 20 C4 30 14 30 20 20 C26 10 36 10 36 20 C36 30 26 30 20 20 Z" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
-"on":c=>`<path d="M5 33 C5 6 35 6 35 33" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+"on":c=>`<path d="M11 33 C11 5 29 5 29 33 Q20 26 11 33 Z" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
 };
 const DIGIT_W=22;
 const DG=[
@@ -192,7 +192,7 @@ c=>`<line x1="11.0" y1="21" x2="11.0" y2="33" fill="none" stroke="${c}" stroke-w
 ];
 const CMAP={"p": "p", "b": "b", "t": "t", "d": "d", "k": "k", "g": "g", "f": "f", "v": "v", "s": "s", "z": "z", "j": "j", "m": "m", "n": "n", "l": "l", "r": "r", "y": "y", "a": "a", "i": "i", "é": "é", "è": "è", "o": "o", "u": "u", "â": "an", "î": "in", "ô": "on", "û": "ou", "ê": "eu", "ĉ": "ch", "ĝ": "gn", "x": "ch", "ç": "ch", "q": "gn", "ñ": "gn"};
 const KEYS={"p": ["p"], "b": ["b"], "t": ["t"], "d": ["d"], "k": ["k"], "g": ["g"], "f": ["f"], "v": ["v"], "s": ["s"], "z": ["z"], "ch": ["ĉ", "x", "ç"], "j": ["j"], "m": ["m"], "n": ["n"], "gn": ["ĝ", "q", "ñ"], "l": ["l"], "r": ["r"], "y": ["y"], "a": ["a"], "i": ["i"], "é": ["é"], "è": ["è"], "o": ["o"], "ou": ["û"], "u": ["u"], "eu": ["ê"], "an": ["â"], "in": ["î"], "on": ["ô"]};
-const HOOKS={"p": "poisson", "b": "bol", "t": "toit", "d": "diamant", "k": "canne", "g": "guidon", "f": "fourchette", "v": "vague", "s": "sablier", "z": "zigzag", "ch": "chapeau", "j": "girafe", "m": "mouette", "n": "nœud", "gn": "peigne", "l": "lune", "r": "roue", "y": "yoyo", "a": "armoire", "i": "île", "é": "étoile", "è": "herbe", "o": "ovale", "ou": "ouragan", "u": "usine", "eu": "heure", "an": "entonnoir", "in": "infini", "on": "pont"};
+const HOOKS={"p": "poisson", "b": "bol", "t": "toit", "d": "diamant", "k": "canne", "g": "guidon", "f": "fourchette", "v": "vague", "s": "sablier", "z": "zigzag", "ch": "chaise", "j": "jupe", "m": "mouette", "n": "nœud", "gn": "peigne", "l": "lune", "r": "roue", "y": "yoyo", "a": "armoire", "i": "île", "é": "étoile", "è": "herbe", "o": "ovale", "ou": "ouragan", "u": "usine", "eu": "heure", "an": "entonnoir", "in": "infini", "on": "ongle"};
 /* DESSON:GENERATED:END */
 const VOW=new Set(VOWELS);
 
