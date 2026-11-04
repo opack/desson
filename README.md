@@ -61,7 +61,7 @@ précédente, la désinstaller d'abord, puis redémarrer Word (ou le PC) pour vi
 cd src
 pip install -r requirements.txt
 playwright install chromium        # une seule fois, pour le guide PDF
-python make.py --version 2.000     # augmenter la version de la police à chaque changement
+python make.py --version 2.200     # augmenter la version de la police à chaque changement
 ```
 
 - `src/desson.py` : les dessins (SVG dans une case de 40 × 40), les objets-repères, la saisie clavier et les chiffres.

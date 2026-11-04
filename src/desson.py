@@ -53,7 +53,7 @@ GLYPHS = {
     'i': lambda c: _line(4, 29, 36, 29, c) + f'<path d="M11 29 Q20 10 29 29" {_st(c)}/>',
     'é': lambda c: _line(20, 6, 20, 34, c) + _line(8, 13, 32, 27, c) + _line(8, 27, 32, 13, c),
     'è': lambda c: f'<polyline points="8,8 20,34 32,8" {_st(c)}/>' + _line(20, 34, 20, 6, c),
-    'o': lambda c: f'<ellipse cx="20" cy="20" rx="14" ry="8" {_st(c)}/>',
+    'o': lambda c: f'<path d="M13 8 A13 13 0 1 1 13 32" {_st(c)}/>' + _dot(18, 20, c, 2.4),  # oreille : C inversé avec un point
     'ou': lambda c: f'<polyline points="{_SPIRAL}" {_st(c)}/>',
     'u': lambda c: f'<polyline points="6,28 18,12 18,28 30,12 30,28" {_st(c)}/>',
     'eu': lambda c: _dot(14, 26, c, 2.6) + _line(14, 26, 14, 6, c) + _line(14, 26, 30, 26, c),
@@ -70,7 +70,7 @@ HOOKS = {
     'p': 'poisson', 'b': 'bol', 't': 'toit', 'd': 'diamant', 'k': 'canne', 'g': 'guidon', 'f': 'fourchette',
     'v': 'vague', 's': 'sablier', 'z': 'zigzag', 'ch': 'chaise', 'j': 'jupe', 'm': 'mouette', 'n': 'nœud',
     'gn': 'peigne', 'l': 'lune', 'r': 'roue', 'y': 'yoyo',
-    'a': 'armoire', 'i': 'île', 'é': 'étoile', 'è': 'herbe', 'o': 'ovale', 'ou': 'ouragan', 'u': 'usine',
+    'a': 'armoire', 'i': 'île', 'é': 'étoile', 'è': 'herbe', 'o': 'oreille', 'ou': 'ouragan', 'u': 'usine',
     'eu': 'heure', 'an': 'entonnoir', 'in': 'infini', 'on': 'ongle',
 }
 
