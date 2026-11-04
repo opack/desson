@@ -56,7 +56,7 @@ GLYPHS = {
     'o': lambda c: f'<path d="M13 8 A13 13 0 1 1 13 32" {_st(c)}/>' + _dot(18, 20, c, 2.4),  # oreille : C inversé avec un point
     'ou': lambda c: f'<polyline points="{_SPIRAL}" {_st(c)}/>',
     'u': lambda c: f'<circle cx="20" cy="22" r="11" {_st(c)}/><path d="M6 17 Q20 31 34 17" {_st(c)}/>',  # Uranus : planète et son anneau
-    'eu': lambda c: _dot(14, 26, c, 2.6) + _line(14, 26, 14, 6, c) + _line(14, 26, 30, 26, c),
+    'eu': lambda c: f'<path d="M4 22 Q20 6 36 22" {_st(c)}/><circle cx="20" cy="24" r="5" {_st(c)}/>',  # œil : paupière et pupille
     'an': lambda c: f'<polygon points="6,7 34,7 20,24" {_st(c)}/>' + _line(20, 24, 20, 35, c),
     'in': lambda c: f'<path d="M20 20 C14 10 4 10 4 20 C4 30 14 30 20 20 C26 10 36 10 36 20 C36 30 26 30 20 20 Z" {_st(c)}/>',
     'on': lambda c: f'<path d="M11 33 C11 5 29 5 29 33 Q20 26 11 33 Z" {_st(c)}/>',  # ongle : arche étroite fermée par un arc vers le haut
@@ -71,7 +71,7 @@ HOOKS = {
     'v': 'vague', 's': 'sablier', 'z': 'zigzag', 'ch': 'chaise', 'j': 'jupe', 'm': 'mouette', 'n': 'nœud',
     'gn': 'peigne', 'l': 'lune', 'r': 'roue', 'y': 'yoyo',
     'a': 'armoire', 'i': 'île', 'é': 'étoile', 'è': 'herbe', 'o': 'oreille', 'ou': 'ouragan', 'u': 'Uranus',
-    'eu': 'heure', 'an': 'entonnoir', 'in': 'infini', 'on': 'ongle',
+    'eu': 'œil', 'an': 'entonnoir', 'in': 'infini', 'on': 'ongle',
 }
 
 # caractère tapé -> son. Règle : un caractère = un son ; le circonflexe marque les sons composés.
