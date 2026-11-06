@@ -54,7 +54,7 @@ GLYPHS = {
     'é': lambda c: _line(20, 6, 20, 34, c) + _line(8, 13, 32, 27, c) + _line(8, 27, 32, 13, c),
     'è': lambda c: f'<polyline points="8,8 20,34 32,8" {_st(c)}/>' + _line(20, 34, 20, 6, c),
     'o': lambda c: f'<path d="M13 8 A13 13 0 1 1 13 32" {_st(c)}/>' + _dot(18, 20, c, 2.4),  # oreille : C inversé avec un point
-    'ou': lambda c: f'<polyline points="{_SPIRAL}" {_st(c)}/>',
+    'ou': lambda c: f'<path d="M8 33 Q8 21 20 21 Q32 21 32 33 Z" {_st(c)}/>' + _line(12, 16, 10, 10, c) + _line(20, 15, 20, 8, c) + _line(28, 16, 30, 10, c),  # patte d'ours : coussinet et trois griffes
     'u': lambda c: f'<circle cx="20" cy="22" r="11" {_st(c)}/><path d="M6 17 Q20 31 34 17" {_st(c)}/>',  # Uranus : planète et son anneau
     'eu': lambda c: f'<path d="M4 22 Q20 6 36 22" {_st(c)}/><circle cx="20" cy="24" r="5" {_st(c)}/>',  # œil : paupière et pupille
     'an': lambda c: f'<polygon points="6,7 34,7 20,24" {_st(c)}/>' + _line(20, 24, 20, 35, c),
@@ -70,7 +70,7 @@ HOOKS = {
     'p': 'poisson', 'b': 'bol', 't': 'toit', 'd': 'diamant', 'k': 'canne', 'g': 'guidon', 'f': 'fourchette',
     'v': 'vague', 's': 'sablier', 'z': 'zigzag', 'ch': 'chaise', 'j': 'jupe', 'm': 'mouette', 'n': 'nœud',
     'gn': 'peigne', 'l': 'lune', 'r': 'roue', 'y': 'yoyo',
-    'a': 'armoire', 'i': 'île', 'é': 'étoile', 'è': 'herbe', 'o': 'oreille', 'ou': 'ouragan', 'u': 'Uranus',
+    'a': 'armoire', 'i': 'île', 'é': 'étoile', 'è': 'herbe', 'o': 'oreille', 'ou': 'ours', 'u': 'Uranus',
     'eu': 'œil', 'an': 'entonnoir', 'in': 'infini', 'on': 'ongle',
 }
 
